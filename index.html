@@ -303,15 +303,13 @@ footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,2
 <main><div id="grid" class="grid"></div></main>
 
 <footer>
-  <span>Monitor PRO v4.0 (Firebase Sync) &mdash; Real-Time Monitoring</span>
+  <span>Monitor PRO v4.2 (Firebase Sync) &mdash; Real-Time Monitoring</span>
   <div class="f-short"><kbd>M</kbd> Mute &nbsp;<kbd>L</kbd> Log &nbsp;<kbd>Esc</kbd> Tutup</div>
 </footer>
 
-<!-- Firebase Compat SDK (Tanpa type=module agar tombol onclick di HTML bisa berjalan mulus) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
-// Database Logo
 const logos = {
   "BCA": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/f9ae7f05c1d3b1f2ad064349fb46ddc6/bca.png",
   "MANDIRI": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/d2a434147adb9189ea9e659fa294c02c/mandiri.png",
@@ -345,7 +343,12 @@ try {
 var services = [];
 var lastSt = {}; 
 var logs = [], logOpen = false, curFilter = "semua";
-var audioOn = false, muted = false, vol = parseFloat(localStorage.getItem("vol"))||1, actx;
+
+// Cek LocalStorage untuk mempertahankan status alarm setelah refresh
+var audioOn = localStorage.getItem("alarmActive") === "true";
+var muted = localStorage.getItem("alarmMuted") === "true";
+var vol = parseFloat(localStorage.getItem("vol")) || 1;
+var actx;
 
 document.getElementById("volSl").value = Math.round(vol*100);
 document.getElementById("volTx").textContent = Math.round(vol*100);
@@ -377,23 +380,61 @@ function seedInitialData() {
   defaults.forEach(s => servicesRef.push(s));
 }
 
-/* ===== AUDIO ===== */
+/* ===== AUDIO SYSTEM ===== */
 function ensureCtx(){
   if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
   if(actx.state==="suspended") actx.resume();
   return actx;
 }
 
-function initAudio(){
-  if(audioOn) return;
-  audioOn = true;
-  try{ ensureCtx(); } catch(e){}
-  speechSynthesis.getVoices();
-
+// Update UI Audio berdasarkan status di memori (saat baru load halaman)
+function syncAudioUI() {
   var btn = document.getElementById("audioBtn");
-  btn.classList.add("active");
-  btn.innerHTML = '<i class="fa-solid fa-bell"></i><span>Alarm Aktif</span>';
-  document.getElementById("muteBtn").innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+  var muteBtn = document.getElementById("muteBtn");
+  if(audioOn) {
+    btn.classList.add("active");
+    btn.innerHTML = '<i class="fa-solid fa-bell"></i><span>Alarm Aktif</span>';
+    muteBtn.innerHTML = muted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
+  } else {
+    btn.classList.remove("active");
+    btn.innerHTML = '<i class="fa-solid fa-bell"></i><span>Aktifkan Alarm</span>';
+    muteBtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+  }
+}
+
+// Fungsi untuk membuka suara browser (Auto-resume context begitu user klik apa saja)
+function unlockAudioContext() {
+  if(audioOn) {
+    try {
+      ensureCtx();
+      if(actx.state === "suspended") actx.resume();
+    } catch(e) {}
+  }
+}
+
+// Pasang event listener satu kali untuk unlock audio saat refresh
+document.body.addEventListener("click", unlockAudioContext, { once: false });
+document.body.addEventListener("keydown", unlockAudioContext, { once: false });
+
+syncAudioUI(); // Sinkronisasi tampilan saat halaman baru dimuat
+
+function initAudio(){
+  if(audioOn) {
+    // Jika sudah aktif lalu diklik lagi, matikan alarm
+    audioOn = false;
+    localStorage.removeItem("alarmActive");
+    syncAudioUI();
+    toast("Alarm dimatikan", "info", "Audio");
+    return;
+  }
+  
+  audioOn = true;
+  localStorage.setItem("alarmActive", "true");
+  
+  try { ensureCtx(); } catch(e){}
+  speechSynthesis.getVoices();
+  
+  syncAudioUI();
 
   playTone(800,.1);
   setTimeout(function(){ playTone(1000,.1); },120);
@@ -423,6 +464,7 @@ function playTone(freq, dur, type){
   } catch(e){}
 }
 
+// Bunyi alarm dikembalikan sepenuhnya
 function alarmOffline(name){
   for(var r = 0; r < 3; r++){
     (function(rNum){
@@ -463,7 +505,8 @@ function alarmRecovered(name){
 function toggleMute(){
   if(!audioOn){ initAudio(); return; }
   muted = !muted;
-  document.getElementById("muteBtn").innerHTML = muted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
+  localStorage.setItem("alarmMuted", muted ? "true" : "false");
+  syncAudioUI();
   toast(muted?"Alarm dimatikan sementara":"Alarm diaktifkan kembali","info","Audio");
 }
 
@@ -511,11 +554,10 @@ function getStatus(s){
   return inW?(s.type==="offline"?"OFFLINE":"GANGGUAN"):"ONLINE"
 }
 
-// Jam Mundur (Menuju Online / Menuju Offline)
 function getNextCD(s) {
   var status = getStatus(s);
   var targetTime = status === "ONLINE" ? s.start : s.end;
-  if(s.type === "online") return "ONLINE"; // Selalu online tidak ada target
+  if(s.type === "online") return "ONLINE"; 
   
   var now = new Date();
   var p = targetTime.split(":");
@@ -857,6 +899,7 @@ function tick(){
         flashHeader("ok-border");
       }
 
+      // Semua Bunyi Alarm Dikembalikan Aktif
       if(audioOn && !muted){
         if(newSt==="OFFLINE") alarmOffline(s.name);
         else if(newSt==="GANGGUAN") alarmGangguan(s.name);
@@ -866,7 +909,6 @@ function tick(){
       addLog(s.name,oldSt,newSt);
       applyFilter();
     } else {
-      // Update countdown ring untuk SEMUA status (Online maupun Offline)
       var cdEl=document.getElementById("cd-"+s.id);
       if(cdEl) cdEl.textContent=getNextCD(s);
       
@@ -875,7 +917,6 @@ function tick(){
         var prog=getProgress(s);
         ringEl.setAttribute("stroke-dashoffset",RC*(1-prog));
         
-        // Update warna ring jika perlu
         var newStLower = newSt.toLowerCase();
         var col = newStLower==="offline" ? "var(--off)" : (newStLower==="gangguan" ? "var(--gn)" : "var(--on)");
         ringEl.setAttribute("stroke", col);
