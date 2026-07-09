@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monitor PRO</title>
+<title>Monitor PRO - Firebase Sync</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root{--bg:#060a13;--bg2:#0d1321;--card:rgba(15,23,42,.85);--border:#1e293b;--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;--on:#10b981;--on-bg:rgba(16,185,129,.08);--gn:#f59e0b;--gn-bg:rgba(245,158,11,.08);--off:#ef4444;--off-bg:rgba(239,68,68,.08);--ac:#06b6d4;--ac-g:rgba(6,182,212,.25)}
+:root{--bg:#060a13;--bg2:#0d1321;--card:rgba(15,23,42,.85);--border:#1e293b;--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;--on:#10b981;--on-bg:rgba(16,185,129,.08);--gn:#3b82f6;--gn-bg:rgba(59,130,246,.08);--off:#ef4444;--off-bg:rgba(239,68,68,.08);--ac:#06b6d4;--ac-g:rgba(6,182,212,.25)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Outfit',sans-serif;color:var(--t1);background:var(--bg);min-height:100vh;overflow-x:hidden}
 .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(6,182,212,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,.04) 1px,transparent 1px);background-size:50px 50px;animation:gd 30s linear infinite}
@@ -19,10 +19,9 @@ body{font-family:'Outfit',sans-serif;color:var(--t1);background:var(--bg);min-he
 .scan-line{position:fixed;left:0;right:0;height:1px;z-index:999;pointer-events:none;background:linear-gradient(90deg,transparent,var(--ac),transparent);opacity:.25;animation:sd 6s ease-in-out infinite}
 @keyframes sd{0%{top:-2px;opacity:0}10%{opacity:.25}90%{opacity:.25}100%{top:100vh;opacity:0}}
 
-/* Visual alarm flash */
 .alarm-flash{position:fixed;inset:0;z-index:1999;pointer-events:none;opacity:0}
 .alarm-flash.red{background:rgba(239,68,68,.15);animation:afRed 1.5s ease forwards}
-.alarm-flash.amber{background:rgba(245,158,11,.1);animation:afAmb 1s ease forwards}
+.alarm-flash.blue{background:rgba(59,130,246,.1);animation:afAmb 1s ease forwards}
 .alarm-flash.green{background:rgba(16,185,129,.08);animation:afGrn .8s ease forwards}
 @keyframes afRed{0%{opacity:1}30%{opacity:.6}60%{opacity:.8}100%{opacity:0}}
 @keyframes afAmb{0%{opacity:1}50%{opacity:.5}100%{opacity:0}}
@@ -30,7 +29,7 @@ body{font-family:'Outfit',sans-serif;color:var(--t1);background:var(--bg);min-he
 
 header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:16px 24px;background:rgba(13,19,33,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:border-color .3s}
 header.alarm-border{border-bottom-color:var(--off)!important;box-shadow:0 4px 30px rgba(239,68,68,.2)}
-header.warn-border{border-bottom-color:var(--gn)!important;box-shadow:0 4px 30px rgba(245,158,11,.15)}
+header.warn-border{border-bottom-color:var(--gn)!important;box-shadow:0 4px 30px rgba(59,130,246,.15)}
 header.ok-border{border-bottom-color:var(--on)!important;box-shadow:0 4px 30px rgba(16,185,129,.12)}
 .h-left{display:flex;align-items:center;gap:14px}
 .logo{display:flex;align-items:center;gap:9px}
@@ -68,22 +67,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .search-box i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:12px}
 .search-box input{width:100%;padding:8px 12px 8px 34px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--t1);font-family:'Outfit',sans-serif;font-size:13px;outline:none;transition:.2s}
 .search-box input:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac-g)}
-.search-box input::placeholder{color:var(--t3)}
 .pills{display:flex;gap:5px;flex-wrap:wrap}
 .pill{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--t2);cursor:pointer;transition:.2s}
 .pill:hover{border-color:var(--ac);color:var(--ac)}
 .pill.a{background:var(--ac);color:#000;border-color:var(--ac)}
-.pill.a-gn{background:var(--gn);color:#000;border-color:var(--gn)}
+.pill.a-gn{background:var(--gn);color:#fff;border-color:var(--gn)}
 .pill.a-off{background:var(--off);color:#fff;border-color:var(--off)}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:7px}
 .sort-sel{padding:6px 10px;border-radius:8px;font-size:11px;border:1px solid var(--border);background:var(--card);color:var(--t2);font-family:'Outfit',sans-serif;outline:none;cursor:pointer}
 
-/* Tombol aktifasi audio di toolbar */
 .audio-activate{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--ac);background:rgba(6,182,212,.1);color:var(--ac);cursor:pointer;transition:.3s;font-family:'Outfit',sans-serif;white-space:nowrap}
 .audio-activate:hover{background:var(--ac);color:#000;box-shadow:0 4px 20px var(--ac-g)}
 .audio-activate.active{border-color:var(--on);background:var(--on-bg);color:var(--on)}
 .audio-activate.active:hover{background:var(--on);color:#000}
-.audio-activate i{font-size:13px}
+.btn-add{display:inline-flex;align-items:center;gap:7px;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--on);background:var(--on-bg);color:var(--on);cursor:pointer;transition:.3s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.btn-add:hover{background:var(--on);color:#000}
 
 main{position:relative;z-index:10;padding:18px 24px 90px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
@@ -92,21 +90,26 @@ main{position:relative;z-index:10;padding:18px 24px 90px}
 .card:hover{transform:translateY(-3px)}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);transition:.3s}
 .card.s-on{border-color:rgba(16,185,129,.3)}.card.s-on:hover{box-shadow:0 8px 35px rgba(16,185,129,.12)}.card.s-on::before{background:var(--on)}
-.card.s-gn{border-color:rgba(245,158,11,.3)}.card.s-gn:hover{box-shadow:0 8px 35px rgba(245,158,11,.12)}.card.s-gn::before{background:var(--gn)}
+.card.s-gn{border-color:rgba(59,130,246,.3)}.card.s-gn:hover{box-shadow:0 8px 35px rgba(59,130,246,.12)}.card.s-gn::before{background:var(--gn)}
 .card.s-off{border-color:rgba(239,68,68,.3)}.card.s-off:hover{box-shadow:0 8px 35px rgba(239,68,68,.12)}.card.s-off::before{background:var(--off)}
 .card.flash-on{animation:fon .7s ease}.card.flash-gn{animation:fgn .7s ease}.card.flash-off{animation:foff .7s ease}
 @keyframes fon{0%{background:rgba(16,185,129,.35)}100%{background:var(--card)}}
-@keyframes fgn{0%{background:rgba(245,158,11,.35)}100%{background:var(--card)}}
+@keyframes fgn{0%{background:rgba(59,130,246,.35)}100%{background:var(--card)}}
 @keyframes foff{0%{background:rgba(239,68,68,.35)}100%{background:var(--card)}}
 .card.hidden-card{display:none}
 
-.c-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.c-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap: 10px;}
+.c-logo-wrap{display:flex; align-items:center; gap:10px;}
+.c-logo{height:28px; max-width:70px; object-fit:contain; border-radius:4px; background:#fff; padding:2px;}
 .c-name{font-weight:700;font-size:16px;letter-spacing:.5px}
 .c-cat{font-size:9px;font-weight:600;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.05);color:var(--t3);letter-spacing:.5px;text-transform:uppercase}
+.c-edit-btn{position:absolute;top:15px;right:15px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:.2s;z-index:5}
+.c-edit-btn:hover{color:var(--ac);border-color:var(--ac)}
+
 .c-status{display:flex;align-items:center;gap:7px;margin-bottom:14px}
 .s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .s-dot.on{background:var(--on);box-shadow:0 0 8px rgba(16,185,129,.35);animation:dp 2s ease infinite}
-.s-dot.gn{background:var(--gn);box-shadow:0 0 8px rgba(245,158,11,.35);animation:dp 1s ease infinite}
+.s-dot.gn{background:var(--gn);box-shadow:0 0 8px rgba(59,130,246,.35);animation:dp 1s ease infinite}
 .s-dot.off{background:var(--off);box-shadow:0 0 8px rgba(239,68,68,.35);animation:dp .7s ease infinite}
 @keyframes dp{0%,100%{opacity:1}50%{opacity:.35}}
 .s-txt{font-weight:700;font-size:14px;letter-spacing:1px}
@@ -160,12 +163,29 @@ main{position:relative;z-index:10;padding:18px 24px 90px}
 .log-dt{flex:1}.log-sv{font-weight:600;font-size:12px;margin-bottom:1px}.log-ch{font-size:10px;color:var(--t2)}.log-ch .ar{color:var(--t3);margin:0 3px}
 .log-empty{text-align:center;color:var(--t3);padding:35px 0;font-size:12px}.log-empty i{font-size:28px;display:block;margin-bottom:10px;opacity:.3}
 
+.modal-ov{position:fixed;inset:0;z-index:2500;background:rgba(6,10,19,.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.3s}
+.modal-ov.open{opacity:1;visibility:visible}
+.modal-bx{width:400px;max-width:90vw;background:rgba(13,19,33,.95);border:1px solid var(--border);border-radius:14px;padding:24px;transform:scale(.9);transition:transform .3s}
+.modal-ov.open .modal-bx{transform:scale(1)}
+.modal-tt{font-family:'Orbitron',monospace;font-size:15px;letter-spacing:1px;margin-bottom:18px;color:var(--ac)}
+.frm-grp{margin-bottom:14px}
+.frm-grp label{display:block;font-size:11px;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
+.frm-grp input, .frm-grp select{width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--t1);font-family:'Outfit',sans-serif;font-size:13px;outline:none;transition:.2s}
+.frm-grp input:focus, .frm-grp select:focus{border-color:var(--ac)}
+.frm-row{display:flex;gap:10px}
+.frm-row .frm-grp{flex:1}
+.modal-act{display:flex;gap:10px;margin-top:18px}
+.btn-sv{flex:1;padding:10px;border-radius:8px;border:none;background:var(--on);color:#000;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;transition:.2s}
+.btn-sv:hover{filter:brightness(1.1)}
+.btn-dl{flex:1;padding:10px;border-radius:8px;border:1px solid var(--off);background:transparent;color:var(--off);font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;transition:.2s}
+.btn-dl:hover{background:var(--off);color:#fff}
+.btn-cc{padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--t2);font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px}
+
 footer{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:9px 24px;font-size:10px;color:var(--t3);background:rgba(6,10,19,.9);backdrop-filter:blur(8px);border-top:1px solid var(--border)}
 footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,255,255,.06);border:1px solid var(--border);font-family:'Outfit',sans-serif}
 
 @media(max-width:768px){header{padding:12px 14px}.h-center{display:none}.stats-bar{padding:0 14px}.stat-item{min-width:70px;padding:10px 8px}.stat-num{font-size:18px}.toolbar{padding:10px 14px}.search-box{flex:1 1 100%}main{padding:14px 14px 70px}.grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}footer{padding:7px 14px}.f-short{display:none}}
-@media(max-width:480px){.grid{grid-template-columns:1fr}.vol-wrap{display:none}.audio-activate span{display:none}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.vol-wrap{display:none}.audio-activate span{display:none}.btn-add span{display:none}}
 </style>
 </head>
 <body>
@@ -174,10 +194,7 @@ footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,2
 <div class="glow-blob a"></div>
 <div class="glow-blob b"></div>
 <div class="scan-line"></div>
-
-<!-- Visual alarm flash layer -->
 <div id="alarmFlash" class="alarm-flash"></div>
-
 <div id="toasts" class="toast-c"></div>
 
 <div id="logOv" class="log-ov" onclick="toggleLog()"></div>
@@ -188,6 +205,44 @@ footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,2
   </div>
   <div id="logCt" class="log-ct"><div class="log-empty"><i class="fa-solid fa-clock-rotate-left"></i><p>Belum ada aktivitas tercatat</p></div></div>
 </aside>
+
+<div id="editModal" class="modal-ov">
+  <div class="modal-bx">
+    <div class="modal-tt" id="modalTitle">Edit Layanan</div>
+    <input type="hidden" id="editId">
+    <div class="frm-grp">
+      <label>Nama Layanan</label>
+      <input type="text" id="editName" placeholder="cth: BCA">
+    </div>
+    <div class="frm-grp">
+      <label>Kategori</label>
+      <input type="text" id="editCat" placeholder="cth: Bank">
+    </div>
+    <div class="frm-grp">
+      <label>Tipe Status</label>
+      <select id="editType" onchange="toggleTimeInput()">
+        <option value="online">Selalu Online (Normal)</option>
+        <option value="offline">Offline (Maintenance)</option>
+        <option value="gangguan">Gangguan</option>
+      </select>
+    </div>
+    <div class="frm-row" id="timeRow">
+      <div class="frm-grp">
+        <label>Jam Mulai</label>
+        <input type="time" id="editStart">
+      </div>
+      <div class="frm-grp">
+        <label>Jam Selesai</label>
+        <input type="time" id="editEnd">
+      </div>
+    </div>
+    <div class="modal-act">
+      <button class="btn-dl" id="btnDelete" onclick="deleteService()" style="display:none;"><i class="fa-solid fa-trash"></i> Hapus</button>
+      <button type="button" class="btn-sv" onclick="saveService()"><i class="fa-solid fa-check"></i> Simpan</button>
+      <button type="button" class="btn-cc" onclick="closeModal()">Batal</button>
+    </div>
+  </div>
+</div>
 
 <header id="mainHeader">
   <div class="h-left">
@@ -230,10 +285,11 @@ footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,2
     <button class="pill" onclick="setFilter('offline',this)">Offline</button>
   </div>
   <div class="tb-right">
-    <!-- TOMBOL AKTIFASI AUDIO -->
     <button class="audio-activate" id="audioBtn" onclick="initAudio()">
-      <i class="fa-solid fa-bell"></i>
-      <span>Aktifkan Alarm</span>
+      <i class="fa-solid fa-bell"></i><span>Aktifkan Alarm</span>
+    </button>
+    <button class="btn-add" onclick="openModal()">
+      <i class="fa-solid fa-plus"></i><span>Tambah</span>
     </button>
     <select class="sort-sel" id="sortSel" onchange="applySort()">
       <option value="nama">Urut: Nama</option>
@@ -247,26 +303,81 @@ footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,2
 <main><div id="grid" class="grid"></div></main>
 
 <footer>
-  <span>Monitor PRO v2.0 &mdash; Sistem Monitoring Real-Time</span>
+  <span>Monitor PRO v4.0 (Firebase Sync) &mdash; Real-Time Monitoring</span>
   <div class="f-short"><kbd>M</kbd> Mute &nbsp;<kbd>L</kbd> Log &nbsp;<kbd>Esc</kbd> Tutup</div>
 </footer>
 
+<!-- Firebase Compat SDK (Tanpa type=module agar tombol onclick di HTML bisa berjalan mulus) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
-/* ===== DATA ===== */
-var services = [
-  {name:"BCA",start:"21:54",end:"00:07",type:"offline",cat:"Bank"},
-  {name:"MANDIRI",start:"22:55",end:"02:55",type:"offline",cat:"Bank"},
-  {name:"BNI",start:"22:58",end:"02:30",type:"gangguan",cat:"Bank"},
-  {name:"BRI",start:"23:15",end:"04:30",type:"gangguan",cat:"Bank"},
-  {name:"DANA",start:"23:29",end:"00:00",type:"gangguan",cat:"E-Wallet"},
-  {name:"QRIS",start:"23:47",end:"23:59",type:"gangguan",cat:"Payment"}
-];
+// Database Logo
+const logos = {
+  "BCA": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/f9ae7f05c1d3b1f2ad064349fb46ddc6/bca.png",
+  "MANDIRI": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/d2a434147adb9189ea9e659fa294c02c/mandiri.png",
+  "BRI": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/35e5febf606ff860a1edac03dc7f8ff5/bri.png",
+  "BNI": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/3502f3c0b5e6b26e6aab815aa6dfb8ba/bni.png",
+  "BSI": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/04f3b2c0254619882e93ff8728e299de/bsi.png",
+  "DANA": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/b4e4d78f6fc47b85d76251cbd5c62820/dana.png",
+  "QRIS": "https://cdn.areabermain.club/assets/cdn/az7/2026/02/06/20260206/0a2bfa43b79c640d3981060e941289d9/qris.png"
+};
 
-/* ===== AUDIO ===== */
+var servicesRef = null;
+try {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBAbxTvC3wKuQxNI8MnDrpE5gNT5O8O4Fw",
+    authDomain: "bankk-c8f04.firebaseapp.com",
+    projectId: "bankk-c8f04",
+    storageBucket: "bankk-c8f04.firebasestorage.app",
+    messagingSenderId: "1095429721810",
+    appId: "1:1095429721810:web:0aadf497d5174e1f28e70b",
+    measurementId: "G-B3G6QBTVSW"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  servicesRef = db.ref('services');
+} catch (e) {
+  console.error("Firebase Init Error:", e);
+  alert("GAGAL MEMUAT FIREBASE!\nPastikan koneksi internet stabil dan tidak ada ekstensi/adblocker yang memblokir script Firebase.");
+}
+
+/* ===== DATA & STATE ===== */
+var services = [];
+var lastSt = {}; 
+var logs = [], logOpen = false, curFilter = "semua";
 var audioOn = false, muted = false, vol = parseFloat(localStorage.getItem("vol"))||1, actx;
+
 document.getElementById("volSl").value = Math.round(vol*100);
 document.getElementById("volTx").textContent = Math.round(vol*100);
 
+/* ===== FIREBASE LISTENER ===== */
+if (servicesRef) {
+  servicesRef.on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      services = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+    } else {
+      services = [];
+      seedInitialData();
+    }
+    applySort();
+  });
+}
+
+function seedInitialData() {
+  if(!servicesRef) return;
+  const defaults = [
+    {name:"BCA",start:"21:54",end:"00:07",type:"offline",cat:"Bank"},
+    {name:"MANDIRI",start:"22:55",end:"02:55",type:"offline",cat:"Bank"},
+    {name:"BNI",start:"22:58",end:"02:30",type:"gangguan",cat:"Bank"},
+    {name:"BRI",start:"23:15",end:"04:30",type:"gangguan",cat:"Bank"},
+    {name:"DANA",start:"23:29",end:"00:00",type:"gangguan",cat:"E-Wallet"},
+    {name:"QRIS",start:"23:47",end:"23:59",type:"gangguan",cat:"Payment"}
+  ];
+  defaults.forEach(s => servicesRef.push(s));
+}
+
+/* ===== AUDIO ===== */
 function ensureCtx(){
   if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
   if(actx.state==="suspended") actx.resume();
@@ -279,20 +390,15 @@ function initAudio(){
   try{ ensureCtx(); } catch(e){}
   speechSynthesis.getVoices();
 
-  // Update tampilan tombol
   var btn = document.getElementById("audioBtn");
   btn.classList.add("active");
   btn.innerHTML = '<i class="fa-solid fa-bell"></i><span>Alarm Aktif</span>';
-
-  // Update ikon mute
   document.getElementById("muteBtn").innerHTML = '<i class="fa-solid fa-volume-high"></i>';
 
-  // Suara konfirmasi + suara
   playTone(800,.1);
   setTimeout(function(){ playTone(1000,.1); },120);
   setTimeout(function(){ playTone(1200,.15); },240);
   setTimeout(function(){ say("Monitor aktif, "+services.length+" layanan terpantau"); },500);
-
   toast("Alarm berhasil diaktifkan","success","Audio");
 }
 
@@ -300,19 +406,15 @@ function say(t){
   if(!audioOn||muted) return;
   speechSynthesis.cancel();
   var m = new SpeechSynthesisUtterance(t);
-  m.lang = "id-ID";
-  m.volume = vol;
-  m.rate = 1.1;
+  m.lang = "id-ID"; m.volume = vol; m.rate = 1.1;
   speechSynthesis.speak(m);
 }
 
-/* Tone dasar */
 function playTone(freq, dur, type){
   if(!audioOn||muted) return;
   try{
     var ctx = ensureCtx();
-    var o = ctx.createOscillator();
-    var g = ctx.createGain();
+    var o = ctx.createOscillator(), g = ctx.createGain();
     o.type = type || "sine";
     o.frequency.value = freq || 1000;
     g.gain.value = vol * 0.4;
@@ -321,23 +423,17 @@ function playTone(freq, dur, type){
   } catch(e){}
 }
 
-/* ===== ALARM OFFLINE - SIREN DARURAT ===== */
 function alarmOffline(name){
-  // Siren naik-turun 3x
   for(var r = 0; r < 3; r++){
     (function(rNum){
       setTimeout(function(){
         if(!audioOn||muted) return;
         try{
           var ctx = ensureCtx();
-          var o = ctx.createOscillator();
-          var g = ctx.createGain();
-          o.type = "sawtooth";
-          g.gain.value = vol * 0.25;
-          // Naik dari 400 ke 1100
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.type = "sawtooth"; g.gain.value = vol * 0.25;
           o.frequency.setValueAtTime(400, ctx.currentTime);
           o.frequency.linearRampToValueAtTime(1100, ctx.currentTime + 0.18);
-          // Turun dari 1100 ke 400
           o.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.36);
           o.connect(g); g.connect(ctx.destination);
           o.start(); o.stop(ctx.currentTime + 0.36);
@@ -345,43 +441,29 @@ function alarmOffline(name){
       }, rNum * 450);
     })(r);
   }
-  // Suara setelah siren
   setTimeout(function(){ say(name + " sedang offline"); }, 1500);
 }
 
-/* ===== ALARM GANGGUAN - BEEP PERINGATAN ===== */
 function alarmGangguan(name){
-  // 4 beep pendek ascending
   var freqs = [500, 600, 700, 600];
   for(var i = 0; i < freqs.length; i++){
-    (function(f, d){
-      setTimeout(function(){ playTone(f, 0.12); }, d);
-    })(freqs[i], i * 180);
+    (function(f, d){ setTimeout(function(){ playTone(f, 0.12); }, d); })(freqs[i], i * 180);
   }
   setTimeout(function(){ say(name + " sedang gangguan"); }, 900);
 }
 
-/* ===== ALARM PULIH - CHIME POSITIF ===== */
 function alarmRecovered(name){
-  // 3 nada naik harmonis
   var freqs = [660, 880, 1100];
   for(var i = 0; i < freqs.length; i++){
-    (function(f, d){
-      setTimeout(function(){ playTone(f, 0.25, "sine"); }, d);
-    })(freqs[i], i * 200);
+    (function(f, d){ setTimeout(function(){ playTone(f, 0.25, "sine"); }, d); })(freqs[i], i * 200);
   }
-  setTimeout(function(){ say(name + " sudah normal kembali"); }, 800);
+  setTimeout(function(){ say(name + " sudah online kembali"); }, 800);
 }
 
 function toggleMute(){
-  if(!audioOn){
-    initAudio();
-    return;
-  }
+  if(!audioOn){ initAudio(); return; }
   muted = !muted;
-  document.getElementById("muteBtn").innerHTML = muted
-    ? '<i class="fa-solid fa-volume-xmark"></i>'
-    : '<i class="fa-solid fa-volume-high"></i>';
+  document.getElementById("muteBtn").innerHTML = muted ? '<i class="fa-solid fa-volume-xmark"></i>' : '<i class="fa-solid fa-volume-high"></i>';
   toast(muted?"Alarm dimatikan sementara":"Alarm diaktifkan kembali","info","Audio");
 }
 
@@ -390,61 +472,89 @@ function setVol(v){vol=v/100;document.getElementById("volTx").textContent=v;loca
 /* ===== VISUAL ALARM ===== */
 function flashScreen(type){
   var el = document.getElementById("alarmFlash");
-  el.className = "alarm-flash";
-  void el.offsetWidth;
-  el.classList.add(type); // "red", "amber", "green"
+  el.className = "alarm-flash"; void el.offsetWidth;
+  el.classList.add(type);
   setTimeout(function(){ el.className = "alarm-flash"; }, 2000);
 }
 
 function flashHeader(type){
   var hd = document.getElementById("mainHeader");
   hd.classList.remove("alarm-border","warn-border","ok-border");
-  void hd.offsetWidth;
-  hd.classList.add(type);
+  void hd.offsetWidth; hd.classList.add(type);
   setTimeout(function(){ hd.classList.remove(type); }, 3000);
 }
 
 /* ===== UTILITAS ===== */
 var RC = 2*Math.PI*26;
 
-function toMin(t){var p=t.split(":");return p[0]*60+(+p[1])}
+function toMin(t) {
+  if(!t) return 0;
+  t = t.toUpperCase();
+  var isPM = t.indexOf("PM") > -1;
+  var isAM = t.indexOf("AM") > -1;
+  t = t.replace("AM", "").replace("PM", "").trim();
+  var p = t.split(":");
+  var h = parseInt(p[0], 10);
+  var m = parseInt(p[1], 10) || 0;
+  if (isPM && h < 12) h += 12;
+  if (isAM && h === 12) h = 0;
+  return h * 60 + m;
+}
+
 function pad(n){return n<10?"0"+n:""+n}
 
 function getStatus(s){
+  if(s.type === "online") return "ONLINE"; 
   var now=new Date(),cur=now.getHours()*60+now.getMinutes();
   var st=toMin(s.start),en=toMin(s.end),inW;
   if(st<=en)inW=cur>=st&&cur<=en;else inW=cur>=st||cur<=en;
   return inW?(s.type==="offline"?"OFFLINE":"GANGGUAN"):"ONLINE"
 }
 
-function getCD(end){
-  var now=new Date(),p=end.split(":"),tgt=new Date();
-  tgt.setHours(+p[0],+p[1],0,0);
-  if(tgt<=now)tgt.setDate(tgt.getDate()+1);
-  var d=tgt-now,h=Math.floor(d/36e5),m=Math.floor(d%36e5/6e4),sc=Math.floor(d%6e4/1e3);
-  return pad(h)+":"+pad(m)+":"+pad(sc)
-}
-
-function getCDsec(end){
-  var now=new Date(),p=end.split(":"),tgt=new Date();
-  tgt.setHours(+p[0],+p[1],0,0);
-  if(tgt<=now)tgt.setDate(tgt.getDate()+1);
-  return Math.max(0,(tgt-now)/1000)
+// Jam Mundur (Menuju Online / Menuju Offline)
+function getNextCD(s) {
+  var status = getStatus(s);
+  var targetTime = status === "ONLINE" ? s.start : s.end;
+  if(s.type === "online") return "ONLINE"; // Selalu online tidak ada target
+  
+  var now = new Date();
+  var p = targetTime.split(":");
+  var tgt = new Date();
+  tgt.setHours(+p[0], +p[1], 0, 0);
+  if (tgt <= now) tgt.setDate(tgt.getDate() + 1);
+  var d = tgt - now;
+  var h = Math.floor(d / 36e5);
+  var m = Math.floor(d % 36e5 / 6e4);
+  var sc = Math.floor(d % 6e4 / 1e3);
+  return pad(h) + ":" + pad(m) + ":" + pad(sc);
 }
 
 function getProgress(s){
   var now=new Date(),cur=now.getHours()*60+now.getMinutes();
-  var st=toMin(s.start),en=toMin(s.end),total,elapsed;
-  if(st<=en){total=en-st;elapsed=cur-st}else{total=(1440-st)+en;elapsed=cur>=st?cur-st:(1440-st)+cur}
-  return total===0?1:Math.min(1,Math.max(0,elapsed/total))
+  var st=toMin(s.start),en=toMin(s.end);
+  var offDur = st<=en ? en-st : (1440-st)+en;
+  var onDur = 1440 - offDur;
+  if(onDur === 0 || offDur === 0) return 1;
+  
+  var status = getStatus(s);
+  var elapsed = 0;
+  if (status === "ONLINE") {
+    if (st <= en) { elapsed = cur - en; }
+    else { elapsed = cur >= en ? cur - en : (1440 - en) + cur; }
+  } else {
+    if (st <= en) { elapsed = cur - st; }
+    else { elapsed = cur >= st ? cur - st : (1440 - st) + cur; }
+  }
+  elapsed = (elapsed % 1440 + 1440) % 1440;
+  var totalDur = status === "ONLINE" ? onDur : offDur;
+  if(totalDur === 0) return 1;
+  return Math.min(1, Math.max(0, elapsed / totalDur));
 }
 
 function getDur(s){var st=toMin(s.start),en=toMin(s.end);return st<=en?en-st:(1440-st)+en}
 function calcUptime(s){return((1440-getDur(s))/1440*100).toFixed(1)}
 
-/* ===== STATUS TRACKING ===== */
-var lastSt={},logs=[],logOpen=false,curFilter="semua";
-
+/* ===== LOG & TOAST ===== */
 function addLog(n,f,t){
   logs.unshift({time:new Date().toLocaleTimeString("id-ID"),name:n,from:f,to:t});
   if(logs.length>100)logs.pop();
@@ -463,7 +573,6 @@ function renderLog(){
   c.innerHTML=h
 }
 
-/* ===== TOAST ===== */
 function toast(msg,type,title){
   var c=document.getElementById("toasts");
   var icons={success:"fa-circle-check",warning:"fa-triangle-exclamation",danger:"fa-circle-xmark",info:"fa-circle-info"};
@@ -477,19 +586,45 @@ function toast(msg,type,title){
 function cardHTML(s,status){
   var cls=status.toLowerCase();
   var up=calcUptime(s),uc=up>=95?"hi":up>=80?"mi":"lo";
-  var body;
-  if(status==="ONLINE"){
-    body='<div class="c-body"><div class="ok-badge"><i class="fa-solid fa-shield-halved"></i> Layanan Aktif</div></div>'
-  }else{
-    var prog=getProgress(s),off=RC*(1-prog);
-    var col=cls==="offline"?"var(--off)":"var(--gn)";
-    var cd=getCD(s.end);
-    var dur=getDur(s),dh=Math.floor(dur/60),dm=dur%60,ds=dh>0?dh+"j "+dm+"m":dm+"m";
-    var ico=status==="OFFLINE"?"circle-xmark":"circle-exclamation";
-    var lbl=status==="OFFLINE"?"Maintenance":"Gangguan";
-    body='<div class="c-body"><div class="cd-ring"><svg width="62" height="62" viewBox="0 0 62 62"><circle cx="31" cy="31" r="26" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/><circle id="ring-'+s.name+'" cx="31" cy="31" r="26" fill="none" stroke="'+col+'" stroke-width="4" stroke-dasharray="'+RC+'" stroke-dashoffset="'+off+'" stroke-linecap="round" transform="rotate(-90 31 31)" style="transition:stroke-dashoffset 1s linear"/></svg><div class="rt" id="cd-'+s.name+'">'+cd+'</div></div><div class="c-info"><div class="c-row"><i class="fa-solid fa-clock"></i> Durasi: '+ds+'</div><div class="c-row"><i class="fa-solid fa-calendar"></i> '+s.start+' - '+s.end+'</div><div class="c-row"><i class="fa-solid fa-'+ico+'"></i> '+lbl+'</div></div></div>'
-  }
-  return '<div class="card s-'+cls+'" id="c-'+s.name+'" data-status="'+status+'" data-name="'+s.name+'" data-cat="'+s.cat+'"><div class="c-top"><div class="c-name">'+s.name+'</div><div class="c-cat">'+s.cat+'</div></div><div class="c-status"><div class="s-dot '+cls+'"></div><span class="s-txt '+cls+'">'+status+'</span></div>'+body+'<div class="up-wrap"><div class="up-head"><span class="ul">Uptime Harian</span><span class="uv">'+up+'%</span></div><div class="up-track"><div class="up-fill '+uc+'" style="width:'+up+'%"></div></div></div></div>'
+  
+  var logoUrl = logos[s.name.toUpperCase()];
+  var logoHtml = logoUrl ? '<img src="'+logoUrl+'" class="c-logo" alt="'+s.name+'">' : '';
+  var nameHtml = logoUrl ? '<span style="font-size:14px; font-weight:600; color:var(--t1);">'+s.name+'</span>' : '<div class="c-name">'+s.name+'</div>';
+  
+  var cd = getNextCD(s);
+  var prog = getProgress(s);
+  var off = RC*(1-prog);
+  var col = cls==="offline" ? "var(--off)" : (cls==="gangguan" ? "var(--gn)" : "var(--on)");
+  
+  var lbl = status==="OFFLINE" ? "Maintenance" : (status==="GANGGUAN" ? "Gangguan" : "Normal");
+  var ico = status==="OFFLINE" ? "circle-xmark" : (status==="GANGGUAN" ? "circle-exclamation" : "circle-check");
+  var cdLbl = status === "ONLINE" ? "Menuju Offline" : "Menuju Online";
+  
+  var body = '<div class="c-body">'+
+    '<div class="cd-ring">'+
+      '<svg width="62" height="62" viewBox="0 0 62 62">'+
+        '<circle cx="31" cy="31" r="26" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="4"/>'+
+        '<circle id="ring-'+s.id+'" cx="31" cy="31" r="26" fill="none" stroke="'+col+'" stroke-width="4" stroke-dasharray="'+RC+'" stroke-dashoffset="'+off+'" stroke-linecap="round" transform="rotate(-90 31 31)" style="transition:stroke-dashoffset 1s linear"/>'+
+      '</svg>'+
+      '<div class="rt" id="cd-'+s.id+'">'+cd+'</div>'+
+    '</div>'+
+    '<div class="c-info">'+
+      '<div class="c-row"><i class="fa-solid fa-stopwatch"></i> '+cdLbl+'</div>'+
+      '<div class="c-row"><i class="fa-solid fa-calendar"></i> '+s.start+' - '+s.end+'</div>'+
+      '<div class="c-row"><i class="fa-solid fa-'+ico+'"></i> '+lbl+'</div>'+
+    '</div>'+
+  '</div>';
+  
+  return '<div class="card s-'+cls+'" id="c-'+s.id+'" data-status="'+status+'" data-name="'+s.name+'" data-cat="'+s.cat+'">'+
+    '<button class="c-edit-btn" onclick="openModal(\''+s.id+'\')"><i class="fa-solid fa-pen"></i></button>'+
+    '<div class="c-top">'+
+      '<div class="c-logo-wrap">'+logoHtml+nameHtml+'</div>'+
+      '<div class="c-cat">'+s.cat+'</div>'+
+    '</div>'+
+    '<div class="c-status"><div class="s-dot '+cls+'"></div><span class="s-txt '+cls+'">'+status+'</span></div>'+
+    body+
+    '<div class="up-wrap"><div class="up-head"><span class="ul">Uptime Harian</span><span class="uv">'+up+'%</span></div><div class="up-track"><div class="up-fill '+uc+'" style="width:'+up+'%"></div></div></div>'+
+  '</div>';
 }
 
 /* ===== FILTER & SORT ===== */
@@ -525,7 +660,6 @@ function applySort(){
   else if(sort==="urgensi"){arr.sort(function(a,b){var sa=getStatus(a),sb=getStatus(b);if(sa==="ONLINE"&&sb!=="ONLINE")return 1;if(sa!=="ONLINE"&&sb==="ONLINE")return -1;if(sa==="ONLINE")return 0;return getCDsec(a.end)-getCDsec(b.end)})}
   var html="";for(var i=0;i<arr.length;i++)html+=cardHTML(arr[i],getStatus(arr[i]));
   document.getElementById("grid").innerHTML=html;
-  lastSt={};for(var i=0;i<services.length;i++)lastSt[services[i].name]=getStatus(services[i]);
   updateStats();applyFilter()
 }
 
@@ -548,6 +682,115 @@ function animN(id,v){
   if(el.textContent!==""+v){el.textContent=v;el.classList.remove("pop");void el.offsetWidth;el.classList.add("pop")}
 }
 
+/* ===== MODAL CRUD ===== */
+function toggleTimeInput() {
+  var type = document.getElementById("editType").value;
+  document.getElementById("timeRow").style.display = (type === "online") ? "none" : "flex";
+}
+
+function openModal(id) {
+  try {
+    var modal = document.getElementById("editModal");
+    document.getElementById("editId").value = id || "";
+    
+    if(id) {
+      var s = services.find(x => x.id === id);
+      if(s) {
+        document.getElementById("modalTitle").innerText = "Edit " + s.name;
+        document.getElementById("editName").value = s.name;
+        document.getElementById("editCat").value = s.cat;
+        document.getElementById("editStart").value = s.start || "00:00";
+        document.getElementById("editEnd").value = s.end || "00:00";
+        document.getElementById("editType").value = s.type || "online";
+        document.getElementById("btnDelete").style.display = "block";
+      }
+    } else {
+      document.getElementById("modalTitle").innerText = "Tambah Layanan";
+      document.getElementById("editName").value = "";
+      document.getElementById("editCat").value = "Bank";
+      document.getElementById("editStart").value = "00:00";
+      document.getElementById("editEnd").value = "00:00";
+      document.getElementById("editType").value = "online"; 
+      document.getElementById("btnDelete").style.display = "none";
+    }
+    toggleTimeInput();
+    modal.classList.add("open");
+  } catch(e) {
+    alert("Error saat membuka form: " + e.message);
+  }
+}
+
+function closeModal() {
+  document.getElementById("editModal").classList.remove("open");
+}
+
+function saveService() {
+  try {
+    if(!servicesRef) {
+      alert("Database Firebase belum terhubung! Matikan Adblocker atau cek koneksi.");
+      return;
+    }
+
+    var id = document.getElementById("editId").value;
+    var type = document.getElementById("editType").value;
+    var nameVal = document.getElementById("editName").value.trim();
+    
+    if(!nameVal) {
+      alert("Nama layanan wajib diisi!");
+      return;
+    }
+
+    var data = {
+      name: nameVal.toUpperCase(),
+      cat: document.getElementById("editCat").value.trim() || "Umum",
+      start: document.getElementById("editStart").value || "00:00",
+      end: document.getElementById("editEnd").value || "00:00",
+      type: type
+    };
+    
+    if(type === "online") {
+      data.start = "00:00";
+      data.end = "00:00";
+    }
+    
+    if(id) {
+      servicesRef.child(id).update(data).then(() => {
+        toast("Layanan berhasil diupdate", "success", "Firebase");
+        closeModal();
+      }).catch(err => {
+        alert("GAGAL UPDATE! Cek Rules Firebase Anda. \nError: " + err.message);
+      });
+    } else {
+      servicesRef.push(data).then(() => {
+        toast("Layanan berhasil ditambahkan", "success", "Firebase");
+        closeModal();
+      }).catch(err => {
+        alert("GAGAL TAMBAH! Cek Rules Firebase Anda. \nError: " + err.message);
+      });
+    }
+  } catch(e) {
+    alert("Terjadi kesalahan sistem saat menyimpan: " + e.message);
+  }
+}
+
+function deleteService() {
+  try {
+    var id = document.getElementById("editId").value;
+    if(!id) return;
+    
+    if(confirm("Yakin ingin menghapus layanan ini?")) {
+      servicesRef.child(id).remove().then(() => {
+        toast("Layanan berhasil dihapus", "info", "Firebase");
+        closeModal();
+      }).catch(err => {
+        alert("Gagal hapus: " + err.message);
+      });
+    }
+  } catch(e) {
+    alert("Terjadi kesalahan sistem saat menghapus: " + e.message);
+  }
+}
+
 /* ===== LOG PANEL ===== */
 function toggleLog(){
   logOpen=!logOpen;
@@ -560,7 +803,10 @@ document.addEventListener("keydown",function(e){
   if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT")return;
   if(e.key==="m"||e.key==="M"){e.preventDefault();toggleMute()}
   else if(e.key==="l"||e.key==="L"){e.preventDefault();toggleLog()}
-  else if(e.key==="Escape"&&logOpen)toggleLog()
+  else if(e.key==="Escape"){
+    if(logOpen)toggleLog();
+    if(document.getElementById("editModal").classList.contains("open"))closeModal();
+  }
 });
 
 /* ===== JAM ===== */
@@ -570,83 +816,76 @@ function updateClock(){
   document.getElementById("dateText").textContent=now.toLocaleDateString("id-ID",{weekday:"long",year:"numeric",month:"long",day:"numeric"})
 }
 
-/* ===== INIT ===== */
-function init(){
-  updateClock();
-  var html="";
-  for(var i=0;i<services.length;i++){
-    var s=services[i],st=getStatus(s);
-    html+=cardHTML(s,st);
-    lastSt[s.name]=st;
-  }
-  document.getElementById("grid").innerHTML=html;
-  updateStats()
-}
-
-/* ===== TICK ===== */
+/* ===== TICK (DETEKSI PERUBAHAN ONLINE/OFFLINE) ===== */
 function tick(){
   updateClock();
   for(var i=0;i<services.length;i++){
     var s=services[i];
     var newSt=getStatus(s);
-    var card=document.getElementById("c-"+s.name);
+    var card=document.getElementById("c-"+s.id);
     if(!card)continue;
-    var oldSt=card.getAttribute("data-status");
 
-    if(oldSt!==newSt){
-      // Rebuild card
+    if(lastSt[s.id] === undefined) {
+      lastSt[s.id] = newSt;
+      continue;
+    }
+
+    var oldSt = lastSt[s.id];
+
+    if(oldSt !== newSt){
+      lastSt[s.id] = newSt;
+
       var tmp=document.createElement("div");
       tmp.innerHTML=cardHTML(s,newSt);
       var newCard=tmp.firstElementChild;
-      newCard.classList.remove("flash-on","flash-gn","flash-off");
       void newCard.offsetWidth;
       newCard.classList.add("flash-"+newSt.toLowerCase());
       card.parentNode.replaceChild(newCard,card);
-      lastSt[s.name]=newSt;
 
-      // Toast (selalu muncul)
       var tt={ONLINE:"success",GANGGUAN:"warning",OFFLINE:"danger"};
-      var tm={ONLINE:"Layanan kembali normal",GANGGUAN:"Terjadi gangguan pada layanan",OFFLINE:"Layanan sedang tidak tersedia"};
+      var tm={ONLINE:"Bank sudah online kembali",GANGGUAN:"Terjadi gangguan pada layanan",OFFLINE:"Layanan sedang offline"};
       toast(tm[newSt],tt[newSt],s.name);
 
-      // Visual alarm (selalu muncul)
       if(newSt==="OFFLINE"){
         flashScreen("red");
         flashHeader("alarm-border");
       } else if(newSt==="GANGGUAN"){
-        flashScreen("amber");
+        flashScreen("blue");
         flashHeader("warn-border");
       } else {
         flashScreen("green");
         flashHeader("ok-border");
       }
 
-      // Suara alarm (hanya jika audio aktif & tidak muted)
       if(audioOn && !muted){
         if(newSt==="OFFLINE") alarmOffline(s.name);
         else if(newSt==="GANGGUAN") alarmGangguan(s.name);
         else alarmRecovered(s.name);
       }
 
-      // Log
       addLog(s.name,oldSt,newSt);
-
       applyFilter();
-    } else if(newSt!=="ONLINE"){
-      // Update countdown saja
-      var cdEl=document.getElementById("cd-"+s.name);
-      if(cdEl)cdEl.textContent=getCD(s.end);
-      var ringEl=document.getElementById("ring-"+s.name);
+    } else {
+      // Update countdown ring untuk SEMUA status (Online maupun Offline)
+      var cdEl=document.getElementById("cd-"+s.id);
+      if(cdEl) cdEl.textContent=getNextCD(s);
+      
+      var ringEl=document.getElementById("ring-"+s.id);
       if(ringEl){
         var prog=getProgress(s);
-        ringEl.setAttribute("stroke-dashoffset",RC*(1-prog))
+        ringEl.setAttribute("stroke-dashoffset",RC*(1-prog));
+        
+        // Update warna ring jika perlu
+        var newStLower = newSt.toLowerCase();
+        var col = newStLower==="offline" ? "var(--off)" : (newStLower==="gangguan" ? "var(--gn)" : "var(--on)");
+        ringEl.setAttribute("stroke", col);
       }
     }
   }
   updateStats()
 }
 
-init();
+updateClock();
 setInterval(tick,1000);
 </script>
 </body>
