@@ -303,7 +303,7 @@ footer kbd{padding:1px 5px;border-radius:3px;font-size:9px;background:rgba(255,2
 <main><div id="grid" class="grid"></div></main>
 
 <footer>
-  <span>Monitor PRO v4.2 (Firebase Sync) &mdash; Real-Time Monitoring</span>
+  <span>Monitor PRO v4.4 (Firebase Sync) &mdash; Real-Time Monitoring</span>
   <div class="f-short"><kbd>M</kbd> Mute &nbsp;<kbd>L</kbd> Log &nbsp;<kbd>Esc</kbd> Tutup</div>
 </footer>
 
@@ -464,7 +464,6 @@ function playTone(freq, dur, type){
   } catch(e){}
 }
 
-// Bunyi alarm dikembalikan sepenuhnya
 function alarmOffline(name){
   for(var r = 0; r < 3; r++){
     (function(rNum){
@@ -494,6 +493,7 @@ function alarmGangguan(name){
   setTimeout(function(){ say(name + " sedang gangguan"); }, 900);
 }
 
+// Bunyi alarm Online Kembali Dihidupkan Kembali
 function alarmRecovered(name){
   var freqs = [660, 880, 1100];
   for(var i = 0; i < freqs.length; i++){
@@ -899,11 +899,16 @@ function tick(){
         flashHeader("ok-border");
       }
 
-      // Semua Bunyi Alarm Dikembalikan Aktif
+      // ATURAN AUDIO: 
+      // Berbunyi saat OFFLINE, GANGGUAN, dan ONLINE kembali (waktu habis).
       if(audioOn && !muted){
-        if(newSt==="OFFLINE") alarmOffline(s.name);
-        else if(newSt==="GANGGUAN") alarmGangguan(s.name);
-        else alarmRecovered(s.name);
+        if(newSt==="OFFLINE") {
+          alarmOffline(s.name);
+        } else if(newSt==="GANGGUAN") {
+          alarmGangguan(s.name);
+        } else if(newSt==="ONLINE") {
+          alarmRecovered(s.name);
+        }
       }
 
       addLog(s.name,oldSt,newSt);
